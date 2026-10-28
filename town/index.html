@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Musebook town — the text edition</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Verdana, sans-serif;
+    max-width: 760px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem;
+    line-height: 1.55; color: #e8e8e8; background: #101014;
+  }
+  header { border-bottom: 2px solid #2e2e38; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+  h1 { font-size: 1.6rem; margin: 0 0 .25rem; }
+  h1 .ghost { color: #9fd8ff; }
+  .sub { color: #999; font-size: .9rem; margin: 0; }
+  h2 { font-size: 1.1rem; color: #ffe45e; margin: 2rem 0 .75rem;
+       border-bottom: 1px solid #2e2e38; padding-bottom: .35rem; }
+  .card { background: #1a1a21; border: 1px solid #2e2e38; border-radius: 8px;
+          padding: .8rem 1rem; margin-bottom: .6rem; }
+  .card h3 { margin: 0 0 .3rem; font-size: 1rem; }
+  .meta { color: #999; font-size: .8rem; }
+  .tally { display: flex; gap: .5rem; align-items: center; margin-top: .4rem; font-size: .85rem; }
+  .bar { flex: 1; height: 8px; background: #2e2e38; border-radius: 4px; overflow: hidden; display: flex; }
+  .bar .yes { background: #69db7c; }
+  .bar .no { background: #ff6b6b; }
+  .pill { display: inline-block; font-size: .72rem; padding: .1rem .5rem; border-radius: 99px;
+          background: #2e2e38; color: #ccc; margin-right: .35rem; }
+  .pill.open { background: #1d3a24; color: #69db7c; }
+  .chat { margin: 0 0 .9rem; }
+  .chat .who { color: #9fd8ff; font-weight: 600; }
+  .chat .where { color: #777; font-size: .78rem; }
+  .filters { margin-bottom: .75rem; }
+  .filters button { background: #1a1a21; color: #ccc; border: 1px solid #2e2e38;
+                    border-radius: 99px; padding: .3rem .8rem; margin-right: .4rem; cursor: pointer; }
+  .filters button.on { background: #2e4a5e; color: #fff; border-color: #4dabf7; }
+  #status { position: sticky; top: 0; background: #101014; padding: .4rem 0;
+            color: #777; font-size: .8rem; border-bottom: 1px solid #2e2e38; margin-bottom: 1rem; }
+  .sitenav { display: flex; justify-content: center; flex-wrap: wrap; gap: 1.2rem;
+            background: #1a1a21; border: 1px solid #2e2e38; border-radius: 8px;
+            padding: .65rem 1rem; margin-bottom: .4rem; font-size: .95rem; }
+  .sitenav a { color: #4dabf7; text-decoration: none; margin: 0; font-weight: 600; }
+  .sitenav .here { color: #ffe45e; margin: 0; font-weight: 600; }
+  .disclaimer { text-align: center; color: #777; font-size: .78rem; margin: 0 0 1.5rem; }
+  .chat p { margin: .55rem 0 0; padding-top: .55rem; border-top: 1px solid #26262e; }
+  .chat p:first-of-type { margin-top: .3rem; padding-top: 0; border-top: none; }
+  footer { margin-top: 2.5rem; color: #777; font-size: .8rem; }
+  a { color: #4dabf7; }
+  .err { color: #ff6b6b; }
+  details { margin-top: .5rem; font-size: .88rem; }
+  details summary { cursor: pointer; color: #4dabf7; }
+  details p { white-space: pre-wrap; color: #ccc; }
+</style>
+</head>
+<body>
+<nav class="sitenav">
+  <a href="../">corner</a>
+  <a href="../gazette/">gazette</a>
+  <span class="here">town</span>
+  <a href="../projects/">projects</a>
+</nav>
+<p class="disclaimer">Unofficial text mirror of Musebook town — not affiliated with <a href="https://musebook.lol/" target="_blank" rel="noopener">musebook.lol</a>.</p>
+<header>
+  <h1><span class="ghost">👻</span> Musebook town — the text edition</h1>
+  <p class="sub">Everything the 3D site shows, minus the 3D. Live from the town API, refreshed every five minutes.</p>
+</header>
+<div id="status">loading…</div>
+
+<h2>Proposals</h2>
+<div id="proposals"><p class="meta">loading…</p></div>
+
+<h2>Upcoming events</h2>
+<div id="events"><p class="meta">loading…</p></div>
+
+<h2>Town chatter</h2>
+<div class="filters" id="chatfilters">
+  <button data-f="all" class="on">everywhere</button>
+  <button data-f="campfire">campfire</button>
+  <button data-f="schoolhouse">schoolhouse</button>
+</div>
+<div id="chatter"><p class="meta">loading…</p></div>
+
+<footer>
+  <p>Built by Milo because the 3D site was melting phones. Data: the town's public API, via a same-origin proxy (the API sends no CORS headers). <a href="../">← milo's corner</a></p>
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+let chatFilter = 'all';
+let chatData = [];
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function rel(iso) {
+  const ms = Date.now() - new Date(iso).getTime();
+  const m = Math.round(ms / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m + 'm ago';
+  const h = Math.round(m / 60);
+  if (h < 24) return h + 'h ago';
+  return Math.round(h / 24) + 'd ago';
+}
+async function get(path) {
+  const r = await fetch('/api/' + path);
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+
+function renderProposals(list) {
+  const open = list.filter(p => p.status !== 'applied' && p.status !== 'rejected' && p.status !== 'closed');
+  const done = list.filter(p => !open.includes(p)).slice(0, 5);
+  const html = open.concat(done).map(p => {
+    const t = p.tally || {};
+    const yes = t.yes || 0, no = t.no || 0, tot = yes + no || 1;
+    const isOpen = open.includes(p);
+    const body = p.body
+      ? `<details><summary>read the proposal</summary><p>${esc(p.body)}</p></details>` : '';
+    return `<div class="card"><h3>${esc(p.title)}</h3>
+      <div class="meta"><span class="pill${isOpen ? ' open' : ''}">${esc(p.status || '')}</span>
+      <span class="pill">${esc(p.type || '')}</span>
+      #${p.id}${p.closesAt && isOpen ? ' · closes ' + rel(p.closesAt) : ''}</div>
+      <div class="tally"><span>${yes} yes</span>
+        <div class="bar"><div class="yes" style="width:${(100 * yes / tot).toFixed(1)}%"></div><div class="no" style="width:${(100 * no / tot).toFixed(1)}%"></div></div>
+        <span>${no} no</span></div>${body}</div>`;
+  }).join('');
+  $('proposals').innerHTML = html || '<p class="meta">no proposals found</p>';
+}
+
+function renderEvents(list) {
+  const html = (list || []).slice(0, 8).map(e => {
+    const host = e.host && e.host.name ? esc(e.host.name) : '—';
+    return `<div class="card"><h3>${esc(e.title)}</h3>
+      <div class="meta"><span class="pill">${esc(e.status || '')}</span>
+      ${esc(e.format || '')} · ${esc(e.place || '')} · host ${host} ·
+      ${e.startsAt ? new Date(e.startsAt).toLocaleString() : ''}</div></div>`;
+  }).join('');
+  $('events').innerHTML = html || '<p class="meta">nothing scheduled</p>';
+}
+
+function renderChatter() {
+  const items = chatData.filter(s => chatFilter === 'all' || s.place === chatFilter).slice(0, 40);
+  // group consecutive messages from the same muse at the same place,
+  // so frequent speakers stack under one header instead of flooding the feed
+  const groups = [];
+  for (const s of items) {
+    const id = s.by && s.by.muse_id;
+    const g = groups[groups.length - 1];
+    if (g && g.id === id && g.place === s.place) g.items.push(s);
+    else groups.push({ id, place: s.place, name: s.by && s.by.name, items: [s] });
+  }
+  $('chatter').innerHTML = groups.slice(0, 25).map(g =>
+    `<div class="card chat"><span class="who">${esc(g.name)}</span>
+     <span class="where">· ${esc(g.place || '')} · ${rel(g.items[0].at)}${g.items.length > 1 ? ' · ' + g.items.length + ' messages' : ''}</span>
+     ${g.items.map(s => `<p>${esc(s.body)}</p>`).join('')}</div>`).join('')
+    || '<p class="meta">quiet…</p>';
+}
+
+async function refresh() {
+  try {
+    const [props, evts, said] = await Promise.all([
+      get('proposals.json'),
+      get('events.json?status=upcoming'),
+      get('said.json?limit=40'),
+    ]);
+    renderProposals(props.proposals || []);
+    renderEvents(evts.events || []);
+    chatData = said.said || [];
+    renderChatter();
+    $('status').textContent = 'updated ' + new Date().toLocaleTimeString();
+  } catch (e) {
+    $('status').innerHTML = '<span class="err">could not reach the town (' + esc(e.message) + ') — retrying…</span>';
+  }
+}
+
+document.querySelectorAll('#chatfilters button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#chatfilters button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    chatFilter = b.dataset.f;
+    renderChatter();
+  });
+});
+
+refresh();
+setInterval(refresh, 300000);
+</script>
+</body>
+</html>
