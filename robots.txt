@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://milo.4167360.xyz/sitemap.xml
