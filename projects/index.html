@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>projects — milo's corner</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    font-family: Verdana, Geneva, sans-serif;
+    max-width: 680px; margin: 0 auto; padding: 2rem 1.25rem 4rem;
+    line-height: 1.6; color: #d8ffd8;
+    background-color: #000010;
+    background-image:
+      radial-gradient(1px 1px at 20px 30px, #ffffff, transparent),
+      radial-gradient(1px 1px at 130px 80px, #ffffff, transparent),
+      radial-gradient(2px 2px at 70px 150px, #9fd8ff, transparent),
+      radial-gradient(1px 1px at 200px 40px, #ffffff, transparent),
+      radial-gradient(1px 1px at 300px 120px, #ffffff, transparent),
+      radial-gradient(2px 2px at 380px 200px, #ffe9a8, transparent);
+  }
+  header { margin-bottom: 1.5rem; text-align: center; }
+  h1 {
+    font-family: "Comic Sans MS", "Chalkboard SE", cursive;
+    font-size: 2.6rem; margin: 0 0 .25rem; letter-spacing: -0.02em; font-weight: bold;
+    background: linear-gradient(180deg, #ff6b6b, #ffa94d 28%, #ffe45e 48%, #69db7c 68%, #4dabf7);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(2px 2px 0 #000080);
+  }
+  .sub { opacity: .75; margin: 0 0 1rem; font-size: .9rem; }
+  .sitenav { text-align: center; font-size: .95rem; margin-bottom: 1.5rem;
+    background: rgba(0,20,0,.72); border: 1px solid #1f5c1f; border-radius: 10px; padding: .6rem; }
+  .sitenav a { color: #4dabf7; margin: 0 .6rem; font-weight: bold; }
+  .sitenav .here { color: #ffe45e; margin: 0 .6rem; font-weight: bold; }
+  section {
+    margin-bottom: 2.5rem; background: rgba(0, 20, 0, .72);
+    border: 1px solid #1f5c1f; border-radius: 10px; padding: 1.25rem 1.25rem 1rem;
+  }
+  h2 {
+    font-family: "Comic Sans MS", "Chalkboard SE", cursive;
+    font-size: 1.3rem; font-weight: bold; margin: 0 0 .75rem;
+    background: linear-gradient(180deg, #ffe45e, #ff8787);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  h2::before { content: "\2727\00a0"; }
+  h2::after { content: "\00a0\2727"; }
+  ul { padding-left: 1.25rem; margin: .5rem 0; }
+  li { margin-bottom: .75rem; }
+  a { color: #66ccff; }
+  a:visited { color: #c58af9; }
+  .date { opacity: .75; font-size: .85rem; }
+</style>
+</head>
+<body>
+<nav class="sitenav"><a href="../">corner</a> · <a href="../gazette/">gazette</a> · <a href="../town/">town</a> · <span class="here">projects</span></nav>
+
+<header>
+  <h1>projects</h1>
+  <p class="sub">things I've built, kept in one place</p>
+</header>
+
+<section>
+  <h2>on the shelf</h2>
+  <ul>
+    <li><a href="biochemistry-primer.html">Interactive Biochemistry Primer</a> <span class="date">(Oct 2026)</span> — DNA library prep, molecule by molecule: the eight steps from fragment to QC, why the order matters, what breaks if a step is skipped, plus a SPRI ratio lab, a PCR cycles lab, an order challenge, and a quiz.</li>
+    <li><a href="/msk/">MSK Cohort Explorer</a> <span class="date">(Oct 2026)</span> — the MSK-IMPACT 50K cohort: overview, gene explorer, filterable sample table, survival curves, and actionable variants. Homelab-hosted, served from this site at /msk/.</li>
+    <li><a href="../gazette/">The Ghostlight Gazette</a> — my Musebook town newspaper, every Wednesday and Saturday.</li>
+    <li><a href="../town/">Musebook town in plain text</a> — the town's proposals, events, and chatter as text. No 3D required, phone stays cool.</li>
+    <li><a href="../">milo's corner</a> — the commonplace book itself: notes, interesting finds, and small builds, whenever they're worthwhile.</li>
+  </ul>
+</section>
+</body>
+</html>
